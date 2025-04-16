@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lot Size Calculator</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --primary-dark: #2563eb;
+            --secondary: #10b981;
+            --accent: #f59e0b;
+            --danger: #ef4444;
+            --light: #f8fafc;
+            --dark: #1e293b;
+            --gray: #64748b;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #3b82f6 0%, #10b981 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            color: var(--dark);
+        }
+        
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            width: 100%;
+            max-width: 550px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .container::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        h1 {
+            color: var(--dark);
+            margin-bottom: 15px;
+            font-size: 32px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+        
+        h1 .emoji {
+            font-size: 36px;
+        }
+        
+        .description {
+            color: var(--gray);
+            margin-bottom: 10px;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+        
+        .form-group {
+            margin-bottom: 24px;
+            position: relative;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--dark);
+            font-weight: 500;
+            font-size: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .emoji-icon {
+            font-size: 18px;
+            width: 24px;
+            text-align: center;
+        }
+        
+        .input-wrapper {
+            position: relative;
+        }
+        
+        input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s;
+            background-color: #f8fafc;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+            background-color: white;
+        }
+        
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.2), 0 2px 4px -1px rgba(59, 130, 246, 0.1);
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.3), 0 4px 6px -2px rgba(59, 130, 246, 0.1);
+            background: linear-gradient(135deg, var(--primary-dark), var(--secondary));
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .result {
+            margin-top: 35px;
+            padding: 25px;
+            background-color: #f8fafc;
+            border-radius: 12px;
+            display: none;
+            border: 1px solid #e2e8f0;
+            position: relative;
+        }
+        
+        .result.show {
+            display: block;
+            animation: fadeIn 0.6s;
+        }
+        
+        .result::before {
+            content: "";
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 20px;
+            background-color: #f8fafc;
+            border-top: 1px solid #e2e8f0;
+            border-left: 1px solid #e2e8f0;
+            transform: translateX(-50%) rotate(45deg);
+        }
+        
+        .result-title {
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 15px;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .result-value-wrapper {
+            background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+            padding: 16px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+            border: 1px solid #a7f3d0;
+        }
+        
+        .result-value {
+            font-size: 42px;
+            font-weight: 700;
+            color: var(--primary);
+            text-align: center;
+            margin: 5px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .result-label {
+            font-size: 14px;
+            color: var(--gray);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .result-details {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .detail-item {
+            text-align: center;
+            padding: 15px 10px;
+            background-color: white;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+            transition: transform 0.3s;
+        }
+        
+        .detail-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        
+        .detail-icon {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: var(--primary);
+        }
+        
+        .detail-label {
+            font-size: 12px;
+            color: var(--gray);
+            margin-bottom: 5px;
+        }
+        
+        .detail-value {
+            font-weight: 600;
+            color: var(--dark);
+            font-size: 16px;
+        }
+        
+        .info-box {
+            margin-top: 25px;
+            padding: 16px;
+            background-color: #eff6ff;
+            border-left: 4px solid var(--primary);
+            border-radius: 8px;
+            font-size: 14px;
+            color: var(--dark);
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+        
+        .info-icon {
+            color: var(--primary);
+            font-size: 20px;
+            margin-top: 2px;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @media (max-width: 576px) {
+            .container {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 24px;
+            }
+            
+            .result-details {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1> Lot Size Calculator </h1>
+            <p class="description">Calculate the optimal lot size based on your risk tolerance, entry price, stop loss price, and contract size.</p>
+        </div>
+        
+        <form id="calculator-form">
+            <div class="form-group">
+                <label for="entry"><span class="emoji-icon">📈</span> Entry Price:</label>
+                <div class="input-wrapper">
+                    <input type="number" id="entry" step="0.00001" min="0" placeholder="Enter your entry price" required>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="stoploss"><span class="emoji-icon">🛑</span> Stop Loss Price:</label>
+                <div class="input-wrapper">
+                    <input type="number" id="stoploss" step="0.00001" min="0" placeholder="Enter your stop loss price" required>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="contractSize"><span class="emoji-icon">📊</span> Contract Size:</label>
+                <div class="input-wrapper">
+                    <input type="number" id="contractSize" step="1" min="1" value="100" placeholder="Enter contract size" required>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="risk"><span class="emoji-icon">⚠️</span> Risk Amount:</label>
+                <div class="input-wrapper">
+                    <input type="number" id="risk" step="0.01" min="0" placeholder="Enter amount you want to risk" required>
+                </div>
+            </div>
+            
+            <button type="submit" class="btn"><i class="fas fa-calculator"></i> Calculate Lot Size</button>
+        </form>
+        
+        <div class="result" id="result">
+            <div class="result-title"><i class="fas fa-chart-pie"></i> Recommended Lot Size</div>
+            
+            <div class="result-value-wrapper">
+                <div class="result-label">Your optimal position size</div>
+                <div class="result-value" id="lot-size">- <span class="emoji">🎯</span></div>
+            </div>
+            
+            <div class="result-details">
+                <div class="detail-item">
+                    <div class="detail-icon">📏</div>
+                    <div class="detail-label">Price Difference</div>
+                    <div class="detail-value" id="price-diff">-</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-icon">💸</div>
+                    <div class="detail-label">Risk Per Lot</div>
+                    <div class="detail-value" id="risk-per-lot">-</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-icon">⚖️</div>
+                    <div class="detail-label">Total Risk</div>
+                    <div class="detail-value" id="total-risk">-</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="info-box">
+            <div class="info-icon"><i class="fas fa-info-circle"></i></div>
+            <div>
+                <strong>Note:</strong> The calculation takes into account the difference between entry and stop loss prices, multiplies by your contract size, and divides your risk amount by this value to determine the appropriate lot size.
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('calculator-form');
+            
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Get input values
+                const entryPrice = parseFloat(document.getElementById('entry').value);
+                const stopLossPrice = parseFloat(document.getElementById('stoploss').value);
+                const contractSize = parseFloat(document.getElementById('contractSize').value);
+                const riskAmount = parseFloat(document.getElementById('risk').value);
+                
+                // Calculate price difference
+                let priceDiff = Math.abs(entryPrice - stopLossPrice);
+                
+                // Calculate risk per lot
+                let riskPerLot = priceDiff * contractSize;
+                
+                // Calculate lot size
+                let lotSize = riskAmount / riskPerLot;
+                
+                // Display results
+                document.getElementById('lot-size').innerHTML = lotSize.toFixed(2) + ' <span class="emoji">🎯</span>';
+                document.getElementById('price-diff').textContent = priceDiff.toFixed(5);
+                document.getElementById('risk-per-lot').textContent = riskPerLot.toFixed(2);
+                document.getElementById('total-risk').textContent = riskAmount.toFixed(2);
+                
+                // Show result container with animation
+                document.getElementById('result').classList.add('show');
+                
+                // Scroll to results if needed
+                document.getElementById('result').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            });
+        });
+    </script>
+</body>
+</html>
